@@ -1,5 +1,7 @@
 import fetch from 'node-fetch'
 
+import { FAILED_FETCHING_DATA_FOR_FILE, FAILED_FETCHING_FILES, FAILED_FETCHING_FILES_LIST, INTERNAL_SERVER_ERROR_FETCHING_DATA_FOR_FILE, INTERNAL_SERVER_ERROR_LISTING_FILES_LIST } from '../utils/contants.js'
+
 const BASE_URL = 'https://echo-serv.tbxnet.com/v1/secret'
 const BEARER_TOKEN = 'Bearer aSuperSecretKey'
 
@@ -16,18 +18,18 @@ export const fetchFilesData = async () => {
       return {
         success: false,
         status: response.status,
-        message: `Failed to fetch files list: ${response.statusText}`
+        message: `${FAILED_FETCHING_FILES} ${response.statusText}`
       }
     }
 
     const data = await response.json()
     return { success: true, files: data.files }
   } catch (error) {
-    console.error('Error fetching files list:', error.message)
+    console.error(FAILED_FETCHING_FILES_LIST, error.message)
     return {
       success: false,
       status: 500,
-      message: 'Internal server error while fetching files list'
+      message: INTERNAL_SERVER_ERROR_LISTING_FILES_LIST
     }
   }
 }
@@ -45,7 +47,7 @@ export const fetchFileData = async (fileName) => {
       return {
         success: false,
         status: response.status,
-        message: `Failed to fetch file data for ${fileName}: ${response.statusText}`
+        message: `${FAILED_FETCHING_DATA_FOR_FILE} ${fileName}: ${response.statusText}`
       }
     }
 
@@ -58,11 +60,11 @@ export const fetchFileData = async (fileName) => {
       lines: filteredLines
     }
   } catch (error) {
-    console.error(`Error fetching data for file ${fileName}:`, error.message)
+    console.error(`${FAILED_FETCHING_DATA_FOR_FILE} ${fileName}:`, error.message)
     return {
       success: false,
       status: 500,
-      message: `Internal server error while fetching file data for ${fileName}`
+      message: `${INTERNAL_SERVER_ERROR_FETCHING_DATA_FOR_FILE} ${fileName}`
     }
   }
 }

@@ -1,47 +1,78 @@
 import { fetchFilesData, fetchFileData } from '../services/filesService.js'
+import { ERROR_TYPE_EMPTY, ERROR_TYPE_INCOMPLETE_DATA, INTERNAL_SERVER_ERROR_FETCHING_DATA, INTERNAL_SERVER_ERROR_LISTING_FILES } from '../utils/contants.js'
+import { transformFileLines } from '../utils/index.js'
 
-export const getFilesData = async (req, res) => {
-  const filesListResult = await fetchFilesData()
+export const handleFilesData = async (req, res) => {
+  const { fileName } = req.query
 
-  if (!filesListResult.success) {
-    return res.status(filesListResult.status).json({ message: filesListResult.message })
-  }
+  if (fileName) {
+    try {
+      const fileData = await fetchFileData(fileName)
 
-  const files = filesListResult.files
-  const successResults = []
-  const errorResults = []
-
-  for (const fileName of files) {
-    const fileDataResult = await fetchFileData(fileName)
-
-    if (!fileDataResult.success) {
-      errorResults.push({
-        file: fileName,
-        error: fileDataResult.message.includes('empty')
-          ? 'Empty file'
-          : 'Incomplete data'
-      })
-      continue
-    }
-
-    const lines = fileDataResult.lines.map((line, i) => {
-      const [file, text, number, hex] = line.split(',')
-
-      // Ensure data integrity
-      if (!file || !text || !number || !hex) {
-        errorResults.push({ file: fileName, error: 'Incomplete data', errorLine: i + 1 })
-        return null
+      if (!fileData.success) {
+        return res.status(fileData.status).json({
+          success: false,
+          message: fileData.message
+        })
       }
 
-      return { text, number: parseInt(number, 10), hex }
-    }).filter((line) => line !== null)
+      const { lines, errors } = await transformFileLines(fileName, fileData)
 
-    if (lines.length === 0) {
-      errorResults.push({ file: fileName, error: 'Empty file' })
-    } else {
-      successResults.push({ file: fileName, lines })
+      return res.status(200).json({ file: fileName, lines, errors })
+    } catch (error) {
+      console.error(INTERNAL_SERVER_ERROR_FETCHING_DATA, error.message)
+
+      return res.status(500).json({
+        success: false,
+        message: INTERNAL_SERVER_ERROR_FETCHING_DATA
+      })
+    }
+  } else {
+    try {
+      const filesListResult = await fetchFilesData()
+
+      if (!filesListResult.success) {
+        return res.status(filesListResult.status).json({ message: filesListResult.message })
+      }
+
+      const files = filesListResult.files
+      const successResults = []
+      const errorResults = []
+
+      for (const fileName of files) {
+        const fileDataResult = await fetchFileData(fileName)
+
+        if (!fileDataResult.success) {
+          errorResults.push({
+            file: fileName,
+            error: fileDataResult.message.includes('empty')
+              ? ERROR_TYPE_EMPTY
+              : ERROR_TYPE_INCOMPLETE_DATA
+          })
+          continue
+        }
+
+        const { lines, errors } = await transformFileLines(fileName, fileDataResult)
+
+        if (errors.length > 0) {
+          errorResults.push(...errors)
+        }
+
+        if (lines.length === 0) {
+          errorResults.push({ file: fileName, error: ERROR_TYPE_EMPTY })
+        } else {
+          successResults.push({ file: fileName, lines })
+        }
+      }
+
+      res.status(200).json({ successData: successResults, errorsData: errorResults })
+    } catch (error) {
+      console.error(INTERNAL_SERVER_ERROR_LISTING_FILES, error.message)
+
+      return res.status(500).json({
+        success: false,
+        message: INTERNAL_SERVER_ERROR_LISTING_FILES
+      })
     }
   }
-
-  res.status(200).json({ successData: successResults, errorsData: errorResults })
 }

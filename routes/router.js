@@ -1,9 +1,8 @@
 import express from 'express'
-import { getFilesData } from '../controllers/filesController.js'
+import { handleFilesData } from '../controllers/filesController.js'
 
 const router = express.Router()
 
-// Route to list all transformed data files
-router.get('/data', getFilesData)
+router.get('/data', handleFilesData)
 
 export default router

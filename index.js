@@ -1,7 +1,8 @@
 import express from 'express'
 
 import router from './routes/router.js'
-import { GENERAL_404_ERROR } from './utils/contants.js'
+
+import { GENERAL_404_ERROR, SUCCESS_SERVER_EXECUTION_MESSAGE } from './utils/contants.js'
 
 const app = express()
 const PORT = 3000
@@ -22,5 +23,5 @@ app.use((req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`)
+  console.log(`${SUCCESS_SERVER_EXECUTION_MESSAGE}${PORT}`)
 })
