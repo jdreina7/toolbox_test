@@ -1,5 +1,5 @@
 import { fetchFilesData, fetchFileData } from '../services/filesService.js'
-import { ERROR_TYPE_EMPTY, ERROR_TYPE_INCOMPLETE_DATA, INTERNAL_SERVER_ERROR_FETCHING_DATA, INTERNAL_SERVER_ERROR_LISTING_FILES } from '../utils/contants.js'
+import { ERROR_TYPE_EMPTY, ERROR_TYPE_INCOMPLETE_DATA, FAILED_FETCHING_FILES_LIST, INTERNAL_SERVER_ERROR_FETCHING_DATA, INTERNAL_SERVER_ERROR_LISTING_FILES, INTERNAL_SERVER_ERROR_LISTING_FILES_LIST } from '../utils/contants.js'
 import { transformFileLines } from '../utils/index.js'
 
 export const handleFilesData = async (req, res) => {
@@ -73,6 +73,25 @@ export const handleFilesData = async (req, res) => {
         success: false,
         message: INTERNAL_SERVER_ERROR_LISTING_FILES
       })
+    }
+  }
+}
+
+export const fetchAllFiles = async (req, res) => {
+  try {
+    const filesListResult = await fetchFilesData()
+
+    if (!filesListResult.success) {
+      return res.status(filesListResult.status).json({ message: filesListResult.message })
+    }
+
+    res.status(200).json({ filesListResult })
+  } catch (error) {
+    console.error(FAILED_FETCHING_FILES_LIST, error.message)
+    return {
+      success: false,
+      status: 500,
+      message: INTERNAL_SERVER_ERROR_LISTING_FILES_LIST
     }
   }
 }

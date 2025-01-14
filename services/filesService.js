@@ -34,7 +34,7 @@ export const fetchFilesData = async () => {
   }
 }
 
-// Fetch individual file data from external API
+// OPTIONAL POINT: Fetch individual file data from external API
 export const fetchFileData = async (fileName) => {
   try {
     const response = await fetch(`${BASE_URL}/file/${fileName}`, {
