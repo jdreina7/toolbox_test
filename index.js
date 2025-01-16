@@ -1,10 +1,19 @@
+const cors = require('cors')
 const express = require('express')
 
 const router = require('./routes/router.js')
 
 const { GENERAL_404_ERROR, SUCCESS_SERVER_EXECUTION_MESSAGE } = require('./utils/contants.js')
 
+const corsOptions = {
+  origin: 'http://localhost:3001',
+  credentials: true,
+  optionsSuccessStatus: 200
+}
+
 const app = express()
+app.use(cors(corsOptions))
+
 const PORT = 3000
 
 // Middleware
