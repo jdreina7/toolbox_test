@@ -1,6 +1,6 @@
-import { ERROR_TYPE_INCOMPLETE_DATA } from './contants.js'
+const { ERROR_TYPE_INCOMPLETE_DATA } = require('./contants.js')
 
-export const transformFileLines = async (fileName, data) => {
+const transformFileLines = async (fileName, data) => {
   const errors = []
   const lines = data.lines.map((line, i) => {
     const [file, text, number, hex] = line.split(',')
@@ -16,3 +16,5 @@ export const transformFileLines = async (fileName, data) => {
 
   return { lines, errors }
 }
+
+module.exports = { transformFileLines }

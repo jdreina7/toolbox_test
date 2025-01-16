@@ -1,13 +1,13 @@
-import { fetchFilesData, fetchFileData } from '../services/filesService.js'
-import { ERROR_TYPE_EMPTY, ERROR_TYPE_INCOMPLETE_DATA, FAILED_FETCHING_FILES_LIST, INTERNAL_SERVER_ERROR_FETCHING_DATA, INTERNAL_SERVER_ERROR_LISTING_FILES, INTERNAL_SERVER_ERROR_LISTING_FILES_LIST } from '../utils/contants.js'
-import { transformFileLines } from '../utils/index.js'
+const services = require('../services/filesService.js')
+const { ERROR_TYPE_EMPTY, ERROR_TYPE_INCOMPLETE_DATA, FAILED_FETCHING_FILES_LIST, INTERNAL_SERVER_ERROR_FETCHING_DATA, INTERNAL_SERVER_ERROR_LISTING_FILES, INTERNAL_SERVER_ERROR_LISTING_FILES_LIST } = require('../utils/contants.js')
+const { transformFileLines } = require('../utils/index.js')
 
-export const handleFilesData = async (req, res) => {
+const handleFilesData = async (req, res) => {
   const { fileName } = req.query
 
   if (fileName) {
     try {
-      const fileData = await fetchFileData(fileName)
+      const fileData = await services.fetchFileData(fileName)
 
       if (!fileData.success) {
         return res.status(fileData.status).json({
@@ -29,7 +29,7 @@ export const handleFilesData = async (req, res) => {
     }
   } else {
     try {
-      const filesListResult = await fetchFilesData()
+      const filesListResult = await services.fetchFilesData()
 
       if (!filesListResult.success) {
         return res.status(filesListResult.status).json({ message: filesListResult.message })
@@ -40,7 +40,7 @@ export const handleFilesData = async (req, res) => {
       const errorResults = []
 
       for (const fileName of files) {
-        const fileDataResult = await fetchFileData(fileName)
+        const fileDataResult = await services.fetchFileData(fileName)
 
         if (!fileDataResult.success) {
           errorResults.push({
@@ -77,9 +77,9 @@ export const handleFilesData = async (req, res) => {
   }
 }
 
-export const fetchAllFiles = async (req, res) => {
+const fetchAllFiles = async (req, res) => {
   try {
-    const filesListResult = await fetchFilesData()
+    const filesListResult = await services.fetchFilesData()
 
     if (!filesListResult.success) {
       return res.status(filesListResult.status).json({ message: filesListResult.message })
@@ -95,3 +95,5 @@ export const fetchAllFiles = async (req, res) => {
     }
   }
 }
+
+module.exports = { handleFilesData, fetchAllFiles }

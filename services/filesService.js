@@ -1,12 +1,12 @@
-import fetch from 'node-fetch'
+const fetch = require('node-fetch')
 
-import { FAILED_FETCHING_DATA_FOR_FILE, FAILED_FETCHING_FILES, FAILED_FETCHING_FILES_LIST, INTERNAL_SERVER_ERROR_FETCHING_DATA_FOR_FILE, INTERNAL_SERVER_ERROR_LISTING_FILES_LIST } from '../utils/contants.js'
+const { FAILED_FETCHING_DATA_FOR_FILE, FAILED_FETCHING_FILES, FAILED_FETCHING_FILES_LIST, INTERNAL_SERVER_ERROR_FETCHING_DATA_FOR_FILE, INTERNAL_SERVER_ERROR_LISTING_FILES_LIST } = require('../utils/contants.js')
 
 const BASE_URL = 'https://echo-serv.tbxnet.com/v1/secret'
 const BEARER_TOKEN = 'Bearer aSuperSecretKey'
 
 // Fetch list of files from external API
-export const fetchFilesData = async () => {
+const fetchFilesData = async () => {
   try {
     const response = await fetch(`${BASE_URL}/files`, {
       headers: {
@@ -35,7 +35,7 @@ export const fetchFilesData = async () => {
 }
 
 // OPTIONAL POINT: Fetch individual file data from external API
-export const fetchFileData = async (fileName) => {
+const fetchFileData = async (fileName) => {
   try {
     const response = await fetch(`${BASE_URL}/file/${fileName}`, {
       headers: {
@@ -68,3 +68,5 @@ export const fetchFileData = async (fileName) => {
     }
   }
 }
+
+module.exports = { fetchFilesData, fetchFileData }

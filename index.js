@@ -1,8 +1,8 @@
-import express from 'express'
+const express = require('express')
 
-import router from './routes/router.js'
+const router = require('./routes/router.js')
 
-import { GENERAL_404_ERROR, SUCCESS_SERVER_EXECUTION_MESSAGE } from './utils/contants.js'
+const { GENERAL_404_ERROR, SUCCESS_SERVER_EXECUTION_MESSAGE } = require('./utils/contants.js')
 
 const app = express()
 const PORT = 3000
@@ -25,3 +25,5 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`${SUCCESS_SERVER_EXECUTION_MESSAGE}${PORT}`)
 })
+
+module.exports = app
